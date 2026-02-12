@@ -29,6 +29,16 @@ def grpc_create_item(item_data):
 	request = myitems_pb2.ItemRequest(id=item_data["id"], name=item_data["name"])
 	return stub.CreateItem(request, timeout=1)
 
+def grpc_update_item(item_data):
+	# Make gRPC call to update item with 1-second timeout
+	request = myitems_pb2.ItemRequest(id=item_data["id"], name=item_data["name"])
+	return stub.UpdateItem(request, timeout=1)
+
+def grpc_delete_item(item_data):
+	# Make gRPC call to delete item with 1-second timeout
+	request = myitems_pb2.ItemRequest(id=item_data["id"])
+	return stub.DeleteItem(request, timeout=1)
+
 @app.route('/items', methods=['POST'])
 def create_item():
 	# Create item with retry logic and circuit breaker
@@ -49,7 +59,7 @@ def create_item():
 
 	for attempt in range(max_attempts):
 		try:
-			print(f"[REST] Attempt {attempt +1}/{max_attempts}")
+			print(f"[REST] Attempt {attempt + 1}/{max_attempts}")
 
 			# Call gRPC through circuit breaker
 			response = breaker.call(grpc_create_item, item_data)
@@ -102,6 +112,99 @@ def list_items():
 
 	except grpc.RpcError as e:
 		return jsonify({"error": str(e)}), 500
+
+@app.route('/items/<int:item_id>', methods=['PUT'])
+def update_item(item_id):
+		# Update specific item with retry logic and circuit breaker
+		# - 3 attempts with exponential backoff (0ms, 100ms, 200ms)
+		# - Circuit breaker opens after 3 consecutive failures
+		# - Returns 503 when circuit is open
+		
+		item_data = request.get_json()
+		
+		if not item_data or 'id' not in item_data or 'name' not in item_data or item_data['id'] != item_id:
+			return jsonify({"error": "Bad request"}), 400
+		
+		# Retry configuration
+		max_attempts = 3
+		delays = [0, 0.1, 0.2]
+
+		last_error = None
+
+		for attempt in range(max_attempts):
+			try:
+				print(f"[REST] Attempt {attempt + 1}/{max_attempts}")
+
+				# Call gRPC through circuit breaker
+				response = breaker.call(grpc_update_item, item_data)
+
+				print(f"[REST] Item updated successfully: {response.id}")
+				return jsonify({"message": "Item updated", "id": response.id, "name": response.name}), 201
+			
+			except CircuitBreakerError:
+				# Circuit is open - fail fast
+				print(f"[REST] Circuit breaker is OPEN - failing fast")
+				return jsonify({"error": "Service unavailable"}), 503
+			
+			except grpc.RpcError as e:
+				last_error = e
+				print(f"[REST] gRPC Error on attempt {attempt + 1}: {e.code()}")
+
+				# Don't retry on last attempt
+				if attempt < max_attempts - 1:
+					delay = delays[attempt + 1]
+					print(f"[REST] Retrying in {delay}s...")
+					time.sleep(delay)
+
+		# All retries exhausted
+		print(f"[REST] All retries exhausted. Returning error.")
+		return jsonify({"error": "Backend failure", "details": str(last_error)}), 500
+
+@app.route('/items/<int:item_id>', methods=['DELETE'])
+def delete_item(item_id):
+	# Delete specific item with retry logic and circuit breaker
+	# - 3 attempts with exponential backoff (0ms, 100ms, 200ms)
+	# - Circuit breaker opens after 3 consecutive failures
+	# - Returns 503 when circuit is open
+
+	item_data = request.get_json()
+
+	if not item_data or item_data['id'] != item_id:
+		return jsonify({"error": "Bad request"}), 400
+	
+	# Retry configuration
+	max_attempts = 3
+	delays = [0, 0.1, 0.2]
+
+	last_error = None
+
+	for attempt in range(max_attempts):
+		try:
+			print(f"[REST] Attempt {attempt + 1}/{max_attempts}")
+
+			# Call gRPC through circuit breaker
+			response = breaker.call(grpc_delete_item, item_data)
+
+			print(f"[REST] Item deleted successfully: {response.id}")
+			return jsonify({"message": "Item deleted", "id": response.id, "name": response.name}), 201
+		
+		except CircuitBreakerError:
+			# Circuit i sopen - fail fast
+			print(f"[REST] Circuit breaker is OPEN - failing fast")
+			return jsonify({"error": "Service unavailable"}), 503
+
+		except grpc.RpcError as e:
+			last_error = e
+			print(f"[REST] gRPC Error on attempt {attempt + 1}: {e.code()}")
+			# Don't retry on ast attempt
+			if attempt < max_attempts - 1:
+				delay = delays[attempt + 1]
+				print(f"[REST] Retrying in {delay}s...")
+				time.sleep(delay)
+
+	# All retries exhausted
+	print(f"[REST] All retries exhausted. Returning error.")
+	return jsonify({"error": "Backend failure", "details": str(last_error)}), 500
 
 @app.route('/health', methods=['GET'])
 def health():

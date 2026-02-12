@@ -40,6 +40,54 @@ class ItemServiceServicer(myitems_pb2_grpc.ItemServiceServicer):
 			context.set_code(grpc.StatusCode.INTERNAL)
 			context.set_details(f"Database error: {str(e)}")
 			return myitems_pb2.ItemResponse(success=False)
+		
+	def UpdateItem(self, request, context):
+		# Unary RPC: Update an existing item in MongoDB
+		try:
+			print(f"[gRPC] Updating item: id={request.id}, name={request.name}")
+
+			# Update MongoDB
+			#doc = {{"id": request.id}, {"$set": {"name": request.name}}}
+			result = collection.update_one({"id": request.id}, {"$set": {"name": request.name}})
+
+			if result.matched_count == 0:
+				print(f"[gRPC] Item not found: {request.id}")
+				context.set_code(grpc.StatusCode.NOT_FOUND)
+				context.set_details("Item not found")
+				return myitems_pb2.ItemResponse(success=False)
+
+			print(f"[gRPC] Item updated successfully: {request.id}")
+			return myitems_pb2.ItemResponse(id=request.id, name=request.name, success=True)
+		
+		except Exception as e:
+			print(f"[gRPC] Error updating item: {e}")
+			context.set_code(grpc.StatusCode.INTERNAL)
+			context.set_details(f"Database error: {str(e)}")
+			return myitems_pb2.ItemResponse(success=False)
+		
+	def DeleteItem(self, request, context):
+		# Unary RPC: Delete an existing item in MongoDB
+		try:
+			print(f"[gRPC] Deleting item: id={request.id}, name={request.name}")
+
+			# Update MongoDB
+			#doc = {"id": request.id, "name": request.name}
+			result = collection.delete_one({"id": request.id})
+
+			if result.deleted_count == 0:
+				print(f"[gRPC]  Item not found: {request.id}")
+				context.set_code(grpc.StatusCode.NOT_FOUND)
+				context.set_details("Item not found")
+				return myitems_pb2.ItemResponse(success=False)
+
+			print(f"[gRPC] Item deleted successfully: {request.id}")
+			return myitems_pb2.ItemResponse(id=request.id, name=request.name, success=True)
+		
+		except Exception as e:
+			print(f"[gRPC] Error deleting item: {e}")
+			context.set_code(grpc.StatusCode.INTERNAL)
+			context.set_details(f"Database error: {str(e)}")
+			return myitems_pb2.ItemResponse(success=False)
 
 	def GetItemById(self, request, context):
 		# Get item by ID from MongoDB

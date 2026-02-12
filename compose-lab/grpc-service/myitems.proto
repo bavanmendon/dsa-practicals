@@ -31,6 +31,12 @@ service ItemService
 	// Unary RPC for creating item
 	rpc CreateItem(ItemRequest) returns (ItemResponse);
 
+	// Unary RPC for updating item
+	rpc UpdateItem(ItemRequest) returns (ItemResponse);
+
+	// Unary RPC for deleting item
+	rpc DeleteItem(ItemRequest) returns(ItemResponse);
+
 	// Get item by ID
 	rpc GetItemById(ItemRequest) returns (ItemResponse);
 	

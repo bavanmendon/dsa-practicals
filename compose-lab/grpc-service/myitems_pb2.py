@@ -24,7 +24,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\rmyitems.proto\x12\x07myitems\"\'\n\x0bItemRequest\x12\n\n\x02id\x18\x01 \x01(\x05\x12\x0c\n\x04name\x18\x02 \x01(\t\"9\n\x0cItemResponse\x12\n\n\x02id\x18\x01 \x01(\x05\x12\x0c\n\x04name\x18\x02 \x01(\t\x12\x0f\n\x07success\x18\x03 \x01(\x08\"\x07\n\x05\x45mpty2\xbd\x01\n\x0bItemService\x12\x39\n\nCreateItem\x12\x14.myitems.ItemRequest\x1a\x15.myitems.ItemResponse\x12:\n\x0bGetItemById\x12\x14.myitems.ItemRequest\x1a\x15.myitems.ItemResponse\x12\x37\n\x0cListAllItems\x12\x0e.myitems.Empty\x1a\x15.myitems.ItemResponse0\x01\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\rmyitems.proto\x12\x07myitems\"\'\n\x0bItemRequest\x12\n\n\x02id\x18\x01 \x01(\x05\x12\x0c\n\x04name\x18\x02 \x01(\t\"9\n\x0cItemResponse\x12\n\n\x02id\x18\x01 \x01(\x05\x12\x0c\n\x04name\x18\x02 \x01(\t\x12\x0f\n\x07success\x18\x03 \x01(\x08\"\x07\n\x05\x45mpty2\xb3\x02\n\x0bItemService\x12\x39\n\nCreateItem\x12\x14.myitems.ItemRequest\x1a\x15.myitems.ItemResponse\x12\x39\n\nUpdateItem\x12\x14.myitems.ItemRequest\x1a\x15.myitems.ItemResponse\x12\x39\n\nDeleteItem\x12\x14.myitems.ItemRequest\x1a\x15.myitems.ItemResponse\x12:\n\x0bGetItemById\x12\x14.myitems.ItemRequest\x1a\x15.myitems.ItemResponse\x12\x37\n\x0cListAllItems\x12\x0e.myitems.Empty\x1a\x15.myitems.ItemResponse0\x01\x62\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -38,5 +38,5 @@ if not _descriptor._USE_C_DESCRIPTORS:
   _globals['_EMPTY']._serialized_start=126
   _globals['_EMPTY']._serialized_end=133
   _globals['_ITEMSERVICE']._serialized_start=136
-  _globals['_ITEMSERVICE']._serialized_end=325
+  _globals['_ITEMSERVICE']._serialized_end=443
 # @@protoc_insertion_point(module_scope)
