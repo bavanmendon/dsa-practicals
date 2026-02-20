@@ -1,0 +1,8 @@
+Flask
+grpcio
+grpcio-tools
+grpcio-reflection
+protobuf
+pymongo
+prometheus_client
+py-grpc-prometheus

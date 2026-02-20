@@ -1,0 +1,11 @@
+Flask==2.3.0
+grpcio
+grpcio-tools
+protobuf
+pybreaker
+prometheus_client
+opentelemetry-sdk
+opentelemetry-api
+opentelemetry-exporter-otlp
+opentelemetry-instrumentation-flask
+opentelemetry-instrumentation-requests
