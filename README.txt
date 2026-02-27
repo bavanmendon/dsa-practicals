@@ -50,3 +50,8 @@ Added root certificate with certificate signature requests.
 Ignored private keys for root, REST and gRPC certificates.
 Modified docker-compose.yml to additionally include traefik and keycloak.
 Modified requirement.txt files for both gRPC and REST service to include necessary libraries.
+
+Version: v5.1
+Type: Report
+Message:
+Added reports for all 5 tasks.
