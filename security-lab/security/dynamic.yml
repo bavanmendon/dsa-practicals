@@ -1,0 +1,18 @@
+tls:
+  stores:
+    default:
+      defaultCertificate:
+        certFile: "/certs/rest-service.crt"
+        keyFile: "/certs/rest-service.key"
+  certificates:
+    - certFile: "/certs/rest-service.crt"
+      keyFile: "/certs/rest-service.key"
+
+http:
+  routers:
+    dashboard:
+      rule: "Host(`traefik.localhost`)"
+      service: api@internal
+      entryPoints:
+        - websecure
+      tls: {}
