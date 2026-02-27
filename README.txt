@@ -55,3 +55,8 @@ Version: v5.1
 Type: Report
 Message:
 Added reports for all 5 tasks.
+
+Version: v5.2
+Type: Report
+Message:
+Edited report 5.
